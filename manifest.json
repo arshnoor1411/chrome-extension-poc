@@ -1,0 +1,44 @@
+{
+    "manifest_version": 3,
+    "name": "Click Recorder",
+    "version": "1.0",
+    "description": "An extension to record user clicks on a page",
+    "host_permissions": [
+        "https://www.developer.chrome.com/*"
+    ],
+    "permissions": [
+        "scripting",
+        "storage",
+        "webRequest",
+        "webRequestBlocking"
+    ],
+    "background": {
+        "service_worker": "entrypoints/background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "entrypoints/content.js"
+            ]
+        }
+    ],
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'; frame-ancestors 'none'"
+    },
+    "action": {
+        "default_popup": "entrypoints/popup/index.html",
+        "default_icon": {
+            "16": "assets/icon16.png",
+            "48": "assets/icon48.png",
+            "128": "assets/icon128.png"
+        }
+    },
+    "icons": {
+        "16": "assets/icon16.png",
+        "48": "assets/icon48.png",
+        "128": "assets/icon128.png"
+    }
+}
