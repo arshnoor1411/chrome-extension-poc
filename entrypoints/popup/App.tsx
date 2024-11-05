@@ -16,26 +16,9 @@ const App: React.FC = () => {
   const [clicks, setClicks] = useState<ClickData[]>([]);
 
   useEffect(() => {
-    const fetchClickData = async () => {
-      try {
-        const response = await fetch('https://cors-anywhere.herokuapp.com/https://googleads.g.doubleclick.net/pagead/viewthroughconversion/962855656/?', {
-          headers: {
-            'Origin': 'https://www.youtube.com'
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setClicks(data.clicks);
-        } else {
-          console.error('Error fetching click data:', response.status);
-        }
-      } catch (error) {
-        console.error('Error fetching click data:', error);
-      }
-    };
-
-    fetchClickData();
+    chrome.storage.local.get(["clicks"], (result) => {
+      setClicks(result.clicks || []);
+    });
   }, []);
 
   return (
