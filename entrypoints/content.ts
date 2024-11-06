@@ -1,24 +1,33 @@
 export default defineContentScript({
-  matches: ['*://*.google.com/*'],
+  matches: ['<all_urls>'],
   main() {
-    console.log('Hello content.');
-  },
-});
+    document.addEventListener('click', (e) => {
+      try {
+        const target = e.target as HTMLElement
+        console.log("Target:", target)
+        console.log("window:", window.location)
+        const clickData = {
+          timestamp: new Date().toISOString(),
+          elementTag: target.tagName,
+          elementId: target.id,
+          elementClass: target.className,
+          url: window.location.href,
+          x: e.clientX,
+          y: e.clientY
+        }
 
-document.addEventListener("click", (event) => {
-  const target = event.target as HTMLElement;
-  console.log("Target:", target)
+        console.log("Click detecyted:", clickData)
+        console.log("DEETTEECCTTEEDD", clickData.elementClass)
 
-  if (target) {
-    const clickData = {
-      tag: target.tagName,
-      id: target.id,
-      classList: Array.from(target.classList),
-      x: event.clientX,
-      y: event.clientY,
-      timestamp: new Date().toISOString()
-    };
 
-    chrome.runtime.sendMessage({ type: "click", data: clickData });
+        chrome.runtime.sendMessage({
+          type: 'CLICK_RECORDED',
+          data: clickData
+        })
+      } catch (error) {
+        console.log("ERROR", error)
+        throw error
+      }
+    })
   }
 })
