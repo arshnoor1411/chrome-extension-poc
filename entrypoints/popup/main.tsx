@@ -1,10 +1,7 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App.tsx';
-import './style.css';
+import React from 'react'
+import { createRoot } from 'react-dom/client'
+import App from '../popup/App'
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-);
+const root = document.createElement('div')
+document.body.appendChild(root)
+createRoot(root).render(<App />)
