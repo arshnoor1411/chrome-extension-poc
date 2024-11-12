@@ -3,9 +3,10 @@ export default defineContentScript({
   main() {
     document.addEventListener('click', (e) => {
       try {
-        const target = e.target as HTMLElement
+        let target = e.target as HTMLElement
         console.log("Target:", target)
         console.log("window:", window.location)
+
         const clickData = {
           timestamp: new Date().toISOString(),
           elementTag: target.tagName,
@@ -18,7 +19,15 @@ export default defineContentScript({
 
         console.log("Click detecyted:", clickData)
         console.log("DEETTEECCTTEEDD", clickData.elementClass)
+        // console.log("Tag name:", document.getElementsByTagName(clickData.elementTag));
 
+        const parent = target.parentElement;
+        console.log("Parent--->", parent)
+        if (parent) {
+          console.log("Parent Tag:", parent.tagName);
+          console.log("Parent Outer HTML:", parent.outerHTML);
+          console.log("Parent Inner HTML:", parent.innerHTML);
+        }
 
         chrome.runtime.sendMessage({
           type: 'CLICK_RECORDED',
