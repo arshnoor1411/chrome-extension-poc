@@ -42,7 +42,7 @@ const App = () => {
               {click.elementId && <p>ID: {click.elementId}</p>}
               {click.elementClass && <p>Class: {click.elementClass}</p>} */}
               <p>URL: {click.url}</p>
-              <p>Clicks: {click.elementClass}</p>
+              {/* <p>Clicks: {click.elementClass}</p> */}
               <p>Position: ({click.x}, {click.y})</p>
               <p className="text-sm truncate">{click.url}</p>
             </div>
