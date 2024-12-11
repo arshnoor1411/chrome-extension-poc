@@ -1,30 +1,31 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 
 interface ClickData {
-  timestamp: string
-  elementTag: string
-  elementId: string
-  elementClass: string
-  url: string
-  x: number
-  y: number
+  timestamp: string;
+  elementTag: string;
+  elementId: string;
+  elementClass: string;
+  url: string;
+  x: number;
+  y: number;
+  screenshot: string | null;
 }
 
 const App = () => {
-  const [clicks, setClicks] = useState<ClickData[]>([])
-  console.log("Clicks", clicks)
+  const [clicks, setClicks] = useState<ClickData[]>([]);
+  console.log("Clicks", clicks);
 
   useEffect(() => {
-    chrome.storage.local.get(['clicks'], (result) => {
-      setClicks(result.clicks || [])
-    })
+    chrome.storage.local.get(["clicks"], (result) => {
+      setClicks(result.clicks || []);
+    });
 
     chrome.storage.onChanged.addListener((changes) => {
       if (changes.clicks) {
-        setClicks(changes.clicks.newValue)
+        setClicks(changes.clicks.newValue);
       }
-    })
-  }, [])
+    });
+  }, []);
 
   return (
     <div className="p-4 w-96">
@@ -43,14 +44,23 @@ const App = () => {
               {click.elementClass && <p>Class: {click.elementClass}</p>} */}
               <p>URL: {click.url}</p>
               {/* <p>Clicks: {click.elementClass}</p> */}
-              <p>Position: ({click.x}, {click.y})</p>
+              <p>
+                Position: ({click.x}, {click.y})
+              </p>
               <p className="text-sm truncate">{click.url}</p>
+              {click.screenshot && (
+                <img
+                  src={click.screenshot}
+                  alt="Screenshot"
+                  className="mt-2 border"
+                />
+              )}
             </div>
           ))
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default App;
