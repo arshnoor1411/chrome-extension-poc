@@ -20,7 +20,13 @@ export default defineConfig({
       '*://*/*'
     ],
     content_security_policy: {
-      extension_pages: "script-src 'self'; object-src 'self'"
-    }
+  "extension_pages": "script-src 'self'"
+    },
+    web_accessible_resources: [
+      {
+        "resources": ["html2canvas.js"],
+        "matches": ["<all_urls>"]
+      }
+    ]
   }
 });
