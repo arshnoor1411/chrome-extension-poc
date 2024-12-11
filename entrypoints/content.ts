@@ -4,11 +4,16 @@ export default defineContentScript({
   matches: ['<all_urls>'],
   main() {
     document.addEventListener('click', async (e) => {
+      e.preventDefault(); 
       try {
         console.log("GGG")
         const target = e.target as HTMLElement;
-        console.log("Target:", target);
+        console.log("Target:", target.tagName);
         console.log("window:", window.location);
+
+    
+        const href = (target as HTMLAnchorElement).href
+        console.log("Captured link:", window.location.href);
 
         const clickData = {
           timestamp: new Date().toISOString(),
@@ -74,7 +79,11 @@ export default defineContentScript({
           }
         );
 
-      } catch (error) {
+      // setTimeout(() => {
+      //   window.location.href = href;
+      // }, 5000); 
+    }
+       catch (error) {
         console.error("Outer ERROR:", error);
         throw error;
       }
