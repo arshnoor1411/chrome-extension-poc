@@ -1,7 +1,9 @@
+import html2canvas from "html2canvas";
+
 export default defineContentScript({
   matches: ['<all_urls>'],
   main() {
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', async (e) => {
       try {
         console.log("GGG")
         const target = e.target as HTMLElement;
@@ -15,8 +17,38 @@ export default defineContentScript({
           elementClass: target.className || null,
           url: window.location.href,
           x: e.clientX,
-          y: e.clientY
+          y: e.clientY,
+          screenshot: 'null'
         };
+
+        const autoDownload = (image: any) => {
+          const downloadLink = document.createElement("a");
+          const fileName = "screenshot.png";
+      
+          downloadLink.href = image;
+          downloadLink.download = fileName;
+          downloadLink.click();
+        };
+
+ 
+        console.log("document.body)-->",document.body)
+        const canvas = await html2canvas(document.body);
+
+        const cursorX = e.clientX;
+        const cursorY = e.clientY;
+
+        const ctx = canvas.getContext("2d");
+        const cursorSize = 50;
+        if(ctx){
+        ctx.font = `${cursorSize}px Arial`
+        ctx.fillStyle = "black"
+        ctx.fillText("⌖", cursorX, cursorY);
+        }
+        
+        console.log("Canvas-->",canvas)
+        const screenshot = canvas.toDataURL("image/png"); 
+        autoDownload(screenshot)
+        clickData.screenshot = screenshot;
 
         console.log("Click detected:", clickData);
 
@@ -27,11 +59,11 @@ export default defineContentScript({
           console.log("Parent Inner HTML:", parent.innerHTML);
         }
 
+       
         chrome.runtime.sendMessage(
           {
             type: 'CLICK_RECORDED',
             data: clickData,
-            action: 'capture screenshot'
           },
           (response) => {
             if (response?.success) {
@@ -49,3 +81,5 @@ export default defineContentScript({
     });
   }
 });
+
+
