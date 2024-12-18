@@ -1,3 +1,4 @@
+import { PutObjectCommand, S3Client, S3ClientConfig } from "@aws-sdk/client-s3";
 import html2canvas from "html2canvas";
 
 export default defineContentScript({
@@ -26,14 +27,14 @@ export default defineContentScript({
           screenshot: 'null'
         };
 
-        const autoDownload = (image: any) => {
-          const downloadLink = document.createElement("a");
-          const fileName = "screenshot.png";
+        // const autoDownload = (image: any) => {
+        //   const downloadLink = document.createElement("a");
+        //   const fileName = "screenshot.png";
       
-          downloadLink.href = image;
-          downloadLink.download = fileName;
-          downloadLink.click();
-        };
+        //   downloadLink.href = image;
+        //   downloadLink.download = fileName;
+        //   downloadLink.click();
+        // };
 
  
         console.log("document.body)-->",document.body)
@@ -52,10 +53,53 @@ export default defineContentScript({
         
         console.log("Canvas-->",canvas)
         const screenshot = canvas.toDataURL("image/png"); 
-        autoDownload(screenshot)
+        // autoDownload(screenshot)
         clickData.screenshot = screenshot;
 
         console.log("Click detected:", clickData);
+
+        const bucketName = import.meta.env.VITE_AWS_S3_BUCKET;
+        console.log("bucketName-->",bucketName)
+        console.log("Access key",import.meta.env.VITE_AWS_ACCESS_KEY_ID)
+        console.log("secret key",import.meta.env.VITE_AWS_SECRET_ACCESS_KEY)
+
+        const clientConfig: S3ClientConfig = {
+          region: import.meta.env.VITE_AWS_REGION,
+          credentials: {
+            accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID ?? '',
+            secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY ?? '',
+          },
+        };
+        
+        const s3Client = new S3Client(clientConfig);
+
+        const fileName = `screenshots/${Date.now()}_${target.tagName}.png`;
+
+        const base64Data = screenshot.replace(/^data:image\/png;base64,/, "");
+        const blob = new Blob([Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0))], { type: "image/png" });
+
+        const uploadParams = {
+          Bucket: bucketName,
+          Key: fileName,
+          Body: blob,
+          ContentType: "image/png",
+          Metadata: {
+            timestamp: clickData.timestamp,
+            elementTag: clickData.elementTag,
+            elementId: clickData.elementId || "null",
+            elementClass: clickData.elementClass || "null",
+            url: clickData.url,
+          },
+        };
+
+        const command = new PutObjectCommand(uploadParams);
+
+        try {
+          const response = await s3Client.send(command);
+          console.log("Screenshot uploaded successfully:", response);
+        } catch (uploadError) {
+          console.error("Error uploading screenshot to S3:", uploadError);
+        }
 
         const parent = target.parentElement;
         if (parent) {
