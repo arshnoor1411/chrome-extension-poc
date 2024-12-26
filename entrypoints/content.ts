@@ -12,6 +12,13 @@ export default defineContentScript({
         console.log("Target:", target.tagName);
         console.log("window:", window.location);
 
+        const roomId = "1234"
+
+        // const taskId = Math.floor(1000 + Math.random() * 9000);
+        // console.log(taskId);
+
+        const taskId = "8663"
+
     
         const href = (target as HTMLAnchorElement).href
         console.log("Captured link:", window.location.href);
@@ -68,12 +75,13 @@ export default defineContentScript({
           credentials: {
             accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID ?? '',
             secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY ?? '',
+            sessionToken: import.meta.env.VITE_AWS_SESSION_TOKEN ?? '',
           },
         };
         
         const s3Client = new S3Client(clientConfig);
 
-        const fileName = `screenshots/${Date.now()}_${target.tagName}.png`;
+        const fileName = `public/screenshots/${roomId}/${taskId}/${Date.now()}_${target.tagName}.png`;
 
         const base64Data = screenshot.replace(/^data:image\/png;base64,/, "");
         const blob = new Blob([Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0))], { type: "image/png" });
